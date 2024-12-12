@@ -1,0 +1,35 @@
+# Recalculate with direct values
+V1 = 1000  # Primary voltage in volts
+V2 = 110   # Secondary voltage in volts
+f = 50     # Frequency in Hz
+A = 0.002  # Core cross-sectional area in square meters
+V_core = 1500e-6  # Core volume in cubic meters
+
+# Material properties
+B_m = {'Solid Iron': 3.0, 'Amorphous Steel': 4.0, 'Silicon Steel': 3.5}  # Flux densities in Tesla
+rho = {'Solid Iron': 8e-7, 'Amorphous Steel': 6e-7, 'Silicon Steel': 4e-7}  # Resistivities in ohm-meters
+
+# Turns ratio
+turns_ratio = V1 / V2
+
+# Store results
+results = {}
+
+# Loop over materials
+for material in B_m:
+    # Calculate N1
+    N1 = V1 / (4.44 * f * A * B_m[material])
+    
+    # Calculate hysteresis loss (Ph)
+    P_h = 150.7 * f * (B_m[material]**1.6) * V_core  # Ph in watts
+    
+    # Calculate the thickness of the laminated sheets (d) such that Pe <= 0.85 * Ph
+    d = ((0.85 * P_h) / (1.65 * f**2 * (B_m[material]**2) * V_core * (1 / rho[material])))**0.5
+    
+    # Calculate N2
+    N2 = N1 / turns_ratio
+    
+    # Store results
+    results[material] = {'N1': N1, 'N2': N2, 'd (m)': d, 'Ph (W)': P_h}
+
+results
